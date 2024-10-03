@@ -104,6 +104,7 @@ function startGame() {
     });
     
     // Muestra la lista de palabras, contadores y tablero
+    document.getElementById('timer').style.display = 'block';
     document.getElementById('wordList').style.display = 'block';
     document.getElementById('foundWords').style.display = 'block';
     document.getElementById('errors').style.display = 'block';
