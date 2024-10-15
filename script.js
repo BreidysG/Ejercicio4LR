@@ -200,9 +200,31 @@ function startTimer() {
         
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
-            alert('¡El tiempo se ha agotado!');
-            resetGame();
+            showFinalResults();
+           
         }
         timeRemaining--;
     }, 1000);
+}
+
+function showFinalResults() {
+    alert('¡El tiempo se ha agotado!'); // Mantén el alert
+    
+    // Ocultar el tablero y el temporizador
+    document.getElementById('gridContainer').style.display = 'none';
+    document.getElementById('timer').style.display = 'none';
+    document.getElementById('wordList').style.display = 'none';
+    document.getElementById('errors').style.display = 'none';
+    
+    // Mostrar el resultado final
+    const finalMessage = `
+        <h2>Resultados Finales</h2>
+        <p>Palabras encontradas: ${foundWords.length}</p>
+        <p>Errores: ${errorWords.length}</p>
+        <p id="pFinal">Ya puedes salir y continuar con el siguiente ejercicio.</p>
+    `;
+    
+    document.getElementById('foundWords').innerHTML = finalMessage;
+    document.getElementById('errors').innerHTML = '';
+
 }
