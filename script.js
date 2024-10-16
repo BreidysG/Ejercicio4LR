@@ -1,3 +1,11 @@
+let foundWords = [];
+let palabras = [];
+let errores = [];
+let errorWords = [];
+let timerInterval;
+const timeLimit = 50; // 3 minutos en segundos
+const totalColumns = 8; // Número de columnas de la grid
+const totalRows = 5; // Número de filas de la grid
 const wordsToFind = [
     "Elefante", "Guitarra", "Playa", "Computadora", "Montaña", "Chocolate","Universo", "Libro", "Estrella", "Fresa", "Camino", "Perro","Aventura", "Canción", "Bosque", "Cielo", "Amor", "Piano",
     "Viaje", "Helado", "Océano", "Luna", "Sol", "Arcoiris",
@@ -88,22 +96,16 @@ const wordsToFind = [
     "Fuego", "Infinito", "Relámpago", "Espejo", "Río", "Susurro"
 ];
 
-const totalColumns = 4;
-const totalRows = 10;
-const timeLimit = 180; // 3 minutes in seconds
-let foundWords = [];
-let errorWords = [];
-let timerInterval;
+window.onload = function() {
+    document.getElementById('startButton').addEventListener('click', startGame);
+};
 
-document.getElementById('startButton').addEventListener('click', startGame);
-
+// Función para iniciar el juego
 function startGame() {
-    // Oculta los párrafos y muestra el juego
     document.querySelectorAll('p').forEach(paragraph => {
         paragraph.style.display = 'none'; // Oculta los párrafos
     });
     
-    // Muestra la lista de palabras, contadores y tablero
     document.getElementById('timer').style.display = 'block';
     document.getElementById('wordList').style.display = 'block';
     document.getElementById('foundWords').style.display = 'block';
@@ -111,27 +113,29 @@ function startGame() {
     document.getElementById('gridContainer').style.display = 'grid';
     document.getElementById('startButton').style.display = 'none';
 
-    resetGame();
-    loadNewWords();
-    startTimer();
+    resetGame(); // Reseteamos todo
+    loadNewWords(); // Cargamos las primeras palabras
+    startTimer(); // Iniciamos el temporizador
 }
 
+// Función para reiniciar el juego
 function resetGame() {
-    foundWords = [];
-    errorWords = [];
-    document.getElementById('gridContainer').innerHTML = '';
+    foundWords = [];  // Reinicia las palabras encontradas
+    errorWords = [];  // Reinicia los errores
+    document.getElementById('gridContainer').innerHTML = '';  // Limpia el tablero
     document.getElementById('foundWords').innerHTML = 'Palabras encontradas: 0';
     document.getElementById('errors').innerHTML = 'Errores: 0';
     document.getElementById('wordList').innerHTML = '';
-    clearInterval(timerInterval);
-    document.getElementById('timer').innerText = `Tiempo restante: 03:00`;
+    clearInterval(timerInterval);  // Reinicia el temporizador si es necesario
+    document.getElementById('timer').innerText = `Tiempo restante: 03:00`;  // Reinicia el temporizador
 }
 
+// Función para cargar nuevas palabras en el tablero y la lista a buscar
 function loadNewWords() {
     // Obtener 40 palabras para el tablero
     const gridWords = getRandomGridWords();
     const gridContainer = document.getElementById('gridContainer');
-    gridContainer.innerHTML = ''; // Limpiar palabras anteriores
+    gridContainer.innerHTML = '';  // Limpiar palabras anteriores del tablero
 
     // Mostrar las palabras en el tablero
     gridWords.forEach(word => {
@@ -147,34 +151,40 @@ function loadNewWords() {
     document.getElementById('wordList').innerHTML = wordsToFind.join(', ');
 }
 
+// Función para seleccionar 40 palabras aleatorias para el tablero
 function getRandomGridWords() {
-    // Obtener una lista aleatoria de 40 palabras para el tablero
     const shuffled = wordsToFind.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, totalColumns * totalRows);
+    return shuffled.slice(0, totalColumns * totalRows);  // 40 palabras aleatorias
 }
 
+// Función para seleccionar aleatoriamente las 5 palabras a buscar
 function getRandomWordsFromGrid(gridWords, count) {
-    // Obtener aleatoriamente 5 palabras de las 40 generadas para el tablero
     const shuffled = gridWords.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
 }
 
+// Función para comprobar si la palabra seleccionada es correcta
 function checkWord(word) {
     const targetWords = document.getElementById('wordList').innerText.split(', ');
     if (targetWords.includes(word)) {
         if (!foundWords.includes(word)) {
             foundWords.push(word);
+            palabras.push(word);
             updateFoundWordsDisplay();
             document.querySelectorAll('.word').forEach(el => {
                 if (el.innerText === word) el.classList.add('found');
             });
             if (foundWords.length === 5) {
-                setTimeout(loadNewWords, 1000); // Cambiar palabras tras acertar todas
+                setTimeout(() => {
+                    foundWords = [];  // Reiniciar las palabras encontradas
+                    loadNewWords();  // Cargar nuevas palabras
+                }, 1000);  // Espera un segundo antes de recargar nuevas palabras
             }
         }
     } else {
         if (!errorWords.includes(word)) {
             errorWords.push(word);
+            errores.push(word);
             document.querySelectorAll('.word').forEach(el => {
                 if (el.innerText === word) el.classList.add('error');
             });
@@ -183,14 +193,18 @@ function checkWord(word) {
     }
 }
 
+// Función para actualizar el contador de palabras encontradas
 function updateFoundWordsDisplay() {
-    document.getElementById('foundWords').innerHTML = `Palabras encontradas: ${foundWords.length}`;
+    document.getElementById('foundWords').innerHTML = `Palabras encontradas: ${palabras.length}`;
+    
 }
 
+// Función para actualizar el contador de errores
 function updateErrorsDisplay() {
-    document.getElementById('errors').innerHTML = `Errores: ${errorWords.length}`;
+    document.getElementById('errors').innerHTML = `Errores: ${errores.length}`;
 }
 
+// Función para iniciar el temporizador
 function startTimer() {
     let timeRemaining = timeLimit;
     timerInterval = setInterval(() => {
@@ -201,14 +215,14 @@ function startTimer() {
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
             showFinalResults();
-           
         }
         timeRemaining--;
     }, 1000);
 }
 
+// Función para mostrar los resultados finales cuando el tiempo se agota
 function showFinalResults() {
-    alert('¡El tiempo se ha agotado!'); // Mantén el alert
+    alert('¡El tiempo se ha agotado!');  // Mostrar el alert cuando se agote el tiempo
     
     // Ocultar el tablero y el temporizador
     document.getElementById('gridContainer').style.display = 'none';
@@ -219,12 +233,11 @@ function showFinalResults() {
     // Mostrar el resultado final
     const finalMessage = `
         <h2>Resultados Finales</h2>
-        <p>Palabras encontradas: ${foundWords.length}</p>
-        <p>Errores: ${errorWords.length}</p>
+        <p>Palabras encontradas: ${palabras.length}</p>
+        <p>Errores: ${errores.length}</p>
         <p id="pFinal">Ya puedes salir y continuar con el siguiente ejercicio.</p>
     `;
     
     document.getElementById('foundWords').innerHTML = finalMessage;
     document.getElementById('errors').innerHTML = '';
-
 }
